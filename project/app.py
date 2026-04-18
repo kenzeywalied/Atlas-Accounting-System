@@ -64,12 +64,8 @@ with st.sidebar:
     st.markdown('<div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#334155;padding:0.25rem">System</div>', unsafe_allow_html=True)
 
     if st.button("Reset Demo Data", use_container_width=True):
-        import os
-        db_path = os.path.join(os.path.dirname(__file__), "accounting.db")
-        if os.path.exists(db_path):
-            os.remove(db_path)
-        init_db()
-        seed_database()
+        from utils.database import reset_db
+        reset_db()
         st.success("Demo data reloaded!")
         st.rerun()
 
