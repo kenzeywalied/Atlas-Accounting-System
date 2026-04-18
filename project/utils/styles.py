@@ -12,7 +12,8 @@ html, body, [class*="css"] {
 }
 
 /* ── Hide Streamlit chrome ── */
-#MainMenu, footer, header { visibility: hidden; }
+#MainMenu, footer { visibility: hidden; }
+header { background: transparent !important; }
 .block-container { padding-top: 1.5rem !important; padding-bottom: 2rem !important; max-width: 1400px; }
 [data-testid="stSidebar"] > div:first-child { padding-top: 1rem; }
 
@@ -100,7 +101,7 @@ html, body, [class*="css"] {
     font-size: 1.4rem;
     background: rgba(99,102,241,0.15);
 }
-.page-header-title { font-size: 1.4rem; font-weight: 800; color: ##000000; line-height: 1; }
+.page-header-title { font-size: 1.4rem; font-weight: 800; color: #F8FAFC; line-height: 1; }
 .page-header-sub   { font-size: 0.8rem; color: #64748B; margin-top: 2px; }
 
 /* ── Tables ── */
