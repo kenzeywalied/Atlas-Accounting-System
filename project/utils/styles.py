@@ -126,10 +126,8 @@ header { background: transparent !important; }
 .stNumberInput > div > div > input,
 .stSelectbox > div > div,
 .stDateInput > div > div > input {
-    background: #0F172A !important;
     border: 1px solid rgba(148,163,184,0.2) !important;
     border-radius: 8px !important;
-    color: #E2E8F0 !important;
     font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 .stTextInput > div > div > input:focus,
@@ -180,8 +178,8 @@ header { background: transparent !important; }
 }
 
 /* ── Metric ── */
-[data-testid="stMetricValue"] { color: #0f172a !important; font-weight: 800 !important; }
-[data-testid="stMetricLabel"] { color: #0f172a !important; font-size: 0.75rem !important; }
+[data-testid="stMetricValue"] { font-weight: 800 !important; }
+[data-testid="stMetricLabel"] { font-size: 0.75rem !important; }
 [data-testid="stMetricDelta"] { font-size: 0.75rem !important; }
 
 /* ── Tags / badges ── */

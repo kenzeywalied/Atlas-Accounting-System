@@ -233,25 +233,30 @@ def get_trial_balance(start_date=None, end_date=None, period_start=None):
 
     # All activity up to end_date
     def fetch_balances(from_date, to_date):
-        q = """
-            SELECT a.id, a.code, a.name, a.type, a.normal_side,
-                   COALESCE(SUM(jl.debit),0)  as total_dr,
-                   COALESCE(SUM(jl.credit),0) as total_cr
-            FROM accounts a
-            LEFT JOIN journal_lines jl ON a.id = jl.account_id
-            LEFT JOIN journal_entries je ON jl.entry_id = je.id AND je.status='Posted'
-        """
         params = []
-        conditions = []
+        conds = ["je.status='Posted'"]
         if from_date:
-            conditions.append("je.entry_date >= ?")
+            conds.append("je.entry_date >= ?")
             params.append(str(from_date))
         if to_date:
-            conditions.append("je.entry_date <= ?")
+            conds.append("je.entry_date <= ?")
             params.append(str(to_date))
-        if conditions:
-            q += " AND " + " AND ".join(conditions)
-        q += " GROUP BY a.id ORDER BY a.code"
+            
+        where_clause = " AND ".join(conds)
+        
+        q = f"""
+            SELECT a.id, a.code, a.name, a.type, a.normal_side,
+                   COALESCE(SUM(trx.debit),0)  as total_dr,
+                   COALESCE(SUM(trx.credit),0) as total_cr
+            FROM accounts a
+            LEFT JOIN (
+                SELECT jl.account_id, jl.debit, jl.credit
+                FROM journal_lines jl
+                JOIN journal_entries je ON jl.entry_id = je.id
+                WHERE {where_clause}
+            ) trx ON a.id = trx.account_id
+            GROUP BY a.id ORDER BY a.code
+        """
         return pd.read_sql_query(q, conn, params=params)
 
     if period_start and start_date:
@@ -278,13 +283,10 @@ def get_trial_balance(start_date=None, end_date=None, period_start=None):
         df["beg_dr"] = 0
         df["beg_cr"] = 0
 
-    # Compute net beginning balance (Dr side or Cr side)
+    # Compute net balance
     def net_balance(row, dr_col, cr_col):
         net = row[dr_col] - row[cr_col]
-        if row["normal_side"] == "Dr":
-            return max(net, 0), max(-net, 0)
-        else:
-            return max(-net, 0), max(net, 0)   # (showing_as_dr, showing_as_cr)
+        return max(net, 0), max(-net, 0)
 
     df[["beg_bal_dr", "beg_bal_cr"]] = df.apply(
         lambda r: pd.Series(net_balance(r, "beg_dr", "beg_cr")), axis=1)
@@ -302,23 +304,32 @@ def get_trial_balance(start_date=None, end_date=None, period_start=None):
 
 def get_income_statement(start_date=None, end_date=None):
     conn = get_conn()
-    q = """
-        SELECT a.code, a.name, a.type, a.subtype, a.normal_side,
-               COALESCE(SUM(jl.debit),0)  as total_dr,
-               COALESCE(SUM(jl.credit),0) as total_cr
-        FROM accounts a
-        LEFT JOIN journal_lines jl ON a.id = jl.account_id
-        LEFT JOIN journal_entries je ON jl.entry_id = je.id AND je.status='Posted'
-        WHERE a.type IN ('Revenue','Expense')
-    """
+    
     params = []
+    conds = ["je.status='Posted'"]
     if start_date:
-        q += " AND (je.entry_date >= ? OR je.entry_date IS NULL)"
+        conds.append("je.entry_date >= ?")
         params.append(str(start_date))
     if end_date:
-        q += " AND (je.entry_date <= ? OR je.entry_date IS NULL)"
+        conds.append("je.entry_date <= ?")
         params.append(str(end_date))
-    q += " GROUP BY a.id ORDER BY a.type DESC, a.code"
+        
+    where_clause = " AND ".join(conds)
+    
+    q = f"""
+        SELECT a.code, a.name, a.type, a.subtype, a.normal_side,
+               COALESCE(SUM(trx.debit),0)  as total_dr,
+               COALESCE(SUM(trx.credit),0) as total_cr
+        FROM accounts a
+        LEFT JOIN (
+            SELECT jl.account_id, jl.debit, jl.credit
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.entry_id = je.id
+            WHERE {where_clause}
+        ) trx ON a.id = trx.account_id
+        WHERE a.type IN ('Revenue','Expense')
+        GROUP BY a.id ORDER BY a.type DESC, a.code
+    """
     df = pd.read_sql_query(q, conn, params=params)
     conn.close()
 
@@ -330,20 +341,29 @@ def get_income_statement(start_date=None, end_date=None):
 
 def get_balance_sheet(as_of_date=None):
     conn = get_conn()
-    q = """
-        SELECT a.code, a.name, a.type, a.subtype, a.normal_side,
-               COALESCE(SUM(jl.debit),0)  as total_dr,
-               COALESCE(SUM(jl.credit),0) as total_cr
-        FROM accounts a
-        LEFT JOIN journal_lines jl ON a.id = jl.account_id
-        LEFT JOIN journal_entries je ON jl.entry_id = je.id AND je.status='Posted'
-        WHERE a.type IN ('Asset','Liability','Equity')
-    """
+    
     params = []
+    conds = ["je.status='Posted'"]
     if as_of_date:
-        q += " AND (je.entry_date <= ? OR je.entry_date IS NULL)"
+        conds.append("je.entry_date <= ?")
         params.append(str(as_of_date))
-    q += " GROUP BY a.id ORDER BY a.type, a.code"
+        
+    where_clause = " AND ".join(conds)
+    
+    q = f"""
+        SELECT a.code, a.name, a.type, a.subtype, a.normal_side,
+               COALESCE(SUM(trx.debit),0)  as total_dr,
+               COALESCE(SUM(trx.credit),0) as total_cr
+        FROM accounts a
+        LEFT JOIN (
+            SELECT jl.account_id, jl.debit, jl.credit
+            FROM journal_lines jl
+            JOIN journal_entries je ON jl.entry_id = je.id
+            WHERE {where_clause}
+        ) trx ON a.id = trx.account_id
+        WHERE a.type IN ('Asset','Liability','Equity')
+        GROUP BY a.id ORDER BY a.type, a.code
+    """
     df = pd.read_sql_query(q, conn, params=params)
     conn.close()
 
@@ -527,3 +547,16 @@ def seed_database():
                 "description": "",
             })
         add_journal_entry(e["date"], e["desc"], e["ref"], lines)
+
+def reset_db():
+    conn = get_conn()
+    c = conn.cursor()
+    c.executescript("""
+        DROP TABLE IF EXISTS journal_lines;
+        DROP TABLE IF EXISTS journal_entries;
+        DROP TABLE IF EXISTS accounts;
+    """)
+    conn.commit()
+    conn.close()
+    init_db()
+    seed_database()
