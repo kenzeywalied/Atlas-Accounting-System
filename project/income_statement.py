@@ -13,7 +13,7 @@ def render():
     today = date.today()
     c1, c2 = st.columns(2)
     start = c1.date_input("Period Start", value=date(today.year, 1, 1), key="is_start")
-    end   = c2.date_input("Period End",   value=today, key="is_end")
+    end   = c2.date_input("Period End",   value=date(2028, 12, 31), key="is_end")
 
     df = get_income_statement(start, end)
 

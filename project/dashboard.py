@@ -24,7 +24,7 @@ def render():
     with col1:
         start = st.date_input("From", value=date(today.year, 1, 1), key="dash_start")
     with col2:
-        end = st.date_input("To", value=today, key="dash_end")
+        end = st.date_input("To", value=date(2028, 12, 31), key="dash_end")
     with col3:
         st.markdown("<div style='height:1.8rem'></div>", unsafe_allow_html=True)
         if st.button("⟳  Refresh Dashboard"):

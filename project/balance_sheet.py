@@ -12,7 +12,7 @@ def render():
 
     today = date.today()
     c1, _ = st.columns([2, 4])
-    as_of = c1.date_input("As-of Date", value=today, key="bs_asof")
+    as_of = c1.date_input("As-of Date", value=date(2028, 12, 31), key="bs_asof")
 
     df = get_balance_sheet(as_of)
     

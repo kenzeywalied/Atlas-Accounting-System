@@ -14,7 +14,7 @@ def render():
     # Controls
     today = date.today()
     c1, c2, c3 = st.columns(3)
-    as_of_date  = c1.date_input("As-of Date (Period End)", value=today, key="tb_end")
+    as_of_date  = c1.date_input("As-of Date (Period End)", value=date(2028, 12, 31), key="tb_end")
     period_start = c2.date_input("Period Start (for movements)", value=date(today.year, 1, 1), key="tb_start")
     show_zero   = c3.checkbox("Show zero-balance accounts", value=False, key="tb_zero")
 

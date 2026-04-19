@@ -17,7 +17,7 @@ def render():
         fc1, fc2, fc3, fc4 = st.columns([2, 2, 2, 1])
         today = date.today()
         start = fc1.date_input("From Date", value=date(today.year, 1, 1), key="je_list_start")
-        end   = fc2.date_input("To Date",   value=today, key="je_list_end")
+        end   = fc2.date_input("To Date",   value=date(2028, 12, 31), key="je_list_end")
         fstatus = fc3.selectbox("Status", ["All", "Posted", "Draft", "Void"], key="je_list_status")
         fc4.markdown("<div style='height:1.8rem'></div>", unsafe_allow_html=True)
 

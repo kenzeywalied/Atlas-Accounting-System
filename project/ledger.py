@@ -20,7 +20,7 @@ def render():
     acct_options = ["All Accounts"] + [f"{r.code} – {r.name}" for r in accounts_df.itertuples()]
     sel_acct   = fc1.selectbox("Account", acct_options, key="ledger_acct")
     start_date = fc2.date_input("From", value=date(today.year, 1, 1), key="ledger_start")
-    end_date   = fc3.date_input("To",   value=today, key="ledger_end")
+    end_date   = fc3.date_input("To",   value=date(2028, 12, 31), key="ledger_end")
 
     acct_id = None
     if sel_acct != "All Accounts":
