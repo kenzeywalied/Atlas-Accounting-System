@@ -83,11 +83,11 @@ with st.sidebar:
         st.success("Problem 3-1 data loaded successfully!")
         st.rerun()
 
-    if st.button("Load Problem 3-7", use_container_width=True, help="Clear DB and populate with Problem 3-7 data"):
-        import populate_problem_3_7
-        populate_problem_3_7.reset_and_populate()
-        st.success("Problem 3-7 data loaded successfully!")
-        st.rerun()
+    # if st.button("Load Problem 3-7", use_container_width=True, help="Clear DB and populate with Problem 3-7 data"):
+    #     import populate_problem_3_7
+    #     populate_problem_3_7.reset_and_populate()
+    #     st.success("Problem 3-7 data loaded successfully!")
+    #     st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
