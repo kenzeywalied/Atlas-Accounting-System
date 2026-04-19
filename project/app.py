@@ -63,10 +63,24 @@ with st.sidebar:
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown('<div style="font-size:0.65rem;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:#334155;padding:0.25rem">System</div>', unsafe_allow_html=True)
 
-    if st.button("Reset Demo Data", use_container_width=True):
-        from utils.database import reset_db
-        reset_db()
-        st.success("Demo data reloaded!")
+    col1, col2 = st.columns(2)
+    with col1:
+        if st.button("Load Demos", use_container_width=True, help="Reset database and load 2024 demo data"):
+            from utils.database import reset_db
+            reset_db(include_entries=True)
+            st.success("Demo data reloaded!")
+            st.rerun()
+    with col2:
+        if st.button("Clear DB", use_container_width=True, help="Reset database and remove all entries"):
+            from utils.database import reset_db
+            reset_db(include_entries=False)
+            st.success("Database cleared!")
+            st.rerun()
+
+    if st.button("Load Problem 3-1", use_container_width=True, help="Clear DB and populate with Problem 3-1 data"):
+        import populate_problem_3_1_fixed
+        populate_problem_3_1_fixed.reset_and_populate()
+        st.success("Problem 3-1 data loaded successfully!")
         st.rerun()
 
     st.markdown("<br>", unsafe_allow_html=True)

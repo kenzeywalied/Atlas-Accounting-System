@@ -15,9 +15,25 @@ def render():
     as_of = c1.date_input("As-of Date", value=today, key="bs_asof")
 
     df = get_balance_sheet(as_of)
+    
+    # Calculate Net Income to include in Equity
+    inc_df = get_income_statement(None, as_of)
+    net_income = inc_df["net"].sum() if not inc_df.empty else 0
+    
     assets_df   = df[df["type"] == "Asset"].copy()
     liab_df     = df[df["type"] == "Liability"].copy()
     equity_df   = df[df["type"] == "Equity"].copy()
+
+    # Append Net Income to Equity
+    if net_income != 0:
+        net_inc_row = pd.DataFrame([{
+            "code": "3999", 
+            "name": "Net Income (Current Period)", 
+            "type": "Equity", 
+            "subtype": "Retained Earnings", 
+            "balance": net_income
+        }])
+        equity_df = pd.concat([equity_df, net_inc_row], ignore_index=True)
 
     total_assets   = assets_df["balance"].sum()
     total_liab     = liab_df["balance"].sum()

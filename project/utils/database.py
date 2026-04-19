@@ -517,7 +517,7 @@ SEED_ENTRIES = [
 ]
 
 
-def seed_database():
+def seed_database(include_entries=True):
     conn = get_conn()
     count = conn.execute("SELECT COUNT(*) as c FROM accounts").fetchone()["c"]
     conn.close()
@@ -537,18 +537,19 @@ def seed_database():
     conn.close()
 
     # Insert journal entries
-    for e in SEED_ENTRIES:
-        lines = []
-        for l in e["lines"]:
-            lines.append({
-                "account_id": code_to_id[l["code"]],
-                "debit": l["dr"],
-                "credit": l["cr"],
-                "description": "",
-            })
-        add_journal_entry(e["date"], e["desc"], e["ref"], lines)
+    if include_entries:
+        for e in SEED_ENTRIES:
+            lines = []
+            for l in e["lines"]:
+                lines.append({
+                    "account_id": code_to_id[l["code"]],
+                    "debit": l["dr"],
+                    "credit": l["cr"],
+                    "description": "",
+                })
+            add_journal_entry(e["date"], e["desc"], e["ref"], lines)
 
-def reset_db():
+def reset_db(include_entries=True):
     conn = get_conn()
     c = conn.cursor()
     c.executescript("""
@@ -559,4 +560,4 @@ def reset_db():
     conn.commit()
     conn.close()
     init_db()
-    seed_database()
+    seed_database(include_entries)
