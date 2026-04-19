@@ -18,7 +18,12 @@ def render():
     
     # Calculate Net Income to include in Equity
     inc_df = get_income_statement(None, as_of)
-    net_income = inc_df["net"].sum() if not inc_df.empty else 0
+    if not inc_df.empty:
+        rev = inc_df[inc_df["type"] == "Revenue"]["net"].sum()
+        exp = inc_df[inc_df["type"] == "Expense"]["net"].sum()
+        net_income = rev - exp
+    else:
+        net_income = 0
     
     assets_df   = df[df["type"] == "Asset"].copy()
     liab_df     = df[df["type"] == "Liability"].copy()
