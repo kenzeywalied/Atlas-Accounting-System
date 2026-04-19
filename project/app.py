@@ -83,6 +83,12 @@ with st.sidebar:
         st.success("Problem 3-1 data loaded successfully!")
         st.rerun()
 
+    if st.button("Load Problem 3-7", use_container_width=True, help="Clear DB and populate with Problem 3-7 data"):
+        import populate_problem_3_7
+        populate_problem_3_7.reset_and_populate()
+        st.success("Problem 3-7 data loaded successfully!")
+        st.rerun()
+
     st.markdown("<br>", unsafe_allow_html=True)
     st.markdown("""
     <div style="background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:10px;padding:0.75rem;font-size:0.72rem;color:#64748B">
